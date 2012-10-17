@@ -36,7 +36,7 @@ public class SimpleServerIntegrationTest {
 
 					@Override
 					public void onMessage(ByteBuffer messageBuffer) {
-						log.info("onRead: {}", messageBuffer);
+						log.info("onMessage: {}", messageBuffer);
 
 						try {
 							ByteBuffer buf = ByteBuffer.allocateDirect(messageBuffer.limit() + 100);
@@ -56,8 +56,8 @@ public class SimpleServerIntegrationTest {
 					}
 
 					@Override
-					public void onError(Throwable e) {
-						log.error("onError", e);
+					public void onError(Throwable exception) {
+						log.error("onError", exception);
 					}
 
 					@Override

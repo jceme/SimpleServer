@@ -20,7 +20,7 @@ import de.me.server.listener.ClientListener;
 /**
  * Internal {@link Client} facade implementation.
  */
-class ClientHandler implements Client {
+public class ClientHandler implements Client {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -29,7 +29,7 @@ class ClientHandler implements Client {
 	private final int capacity;
 
 
-	ClientHandler(SocketChannel client, int capacity) {
+	public ClientHandler(SocketChannel client, int capacity) {
 		this.client = client;
 		this.capacity = capacity;
 	}
@@ -70,7 +70,7 @@ class ClientHandler implements Client {
 	/**
 	 * Starts handling client traffic.
 	 */
-	void execute() throws Exception {
+	public void execute() throws Exception {
 		client.configureBlocking(false);
 
 		final Selector selector = Selector.open();
@@ -79,20 +79,40 @@ class ClientHandler implements Client {
 		final ByteBuffer buffer = ByteBuffer.allocateDirect(capacity);
 
 		for (;;) {
-			if (selector.select() > 0) {
-				if (selkey.isReadable()) {
-					buffer.clear();
+			selector.select();
 
-					int r = client.read(buffer);
+			if (log.isTraceEnabled()) {
+				log.trace("Have selection ops {}", selkey.readyOps());
+			}
 
-					if (r < 0) {
-						onClose();
-						break;
-					}
-					else if (r > 0) {
-						buffer.flip();
-						onMessage(buffer);
-					}
+			if (selkey.isReadable()) {
+				log.trace("Client signalized readability");
+
+				buffer.clear();
+
+				int r = client.read(buffer);
+
+				if (r < 0) {
+					log.debug("Client read signalized EOF");
+
+					onClose();
+					break;
+				}
+				else if (r > 0) {
+					log.trace("Client read message of length {}", r);
+
+					buffer.flip();
+					onMessage(buffer);
+				}
+			}
+
+			if (log.isTraceEnabled()) {
+				if (selkey.isConnectable()) {
+					log.trace("Client signalized connectability");
+				}
+
+				if (selkey.isWritable()) {
+					log.trace("Client signalized writability");
 				}
 			}
 		}
@@ -135,7 +155,7 @@ class ClientHandler implements Client {
 		}
 	}
 
-	void onError(Throwable e) throws ListenerException {
+	public void onError(Throwable e) throws ListenerException {
 		for (ClientListener listener : listeners) {
 			try {
 				listener.onError(e);

@@ -72,7 +72,8 @@ public class SimpleServer {
 
 	/**
 	 * Starts and executes the server.<br>
-	 * This method will block until the server was shut-down by {@link #stop()}.
+	 * This method will <b>block</b> until the server was shut-down by {@link #stop()}.<br><br>
+	 * <b>Note</b> that listeners should be added <u>before</u> by calling {@link #addListener(ClientAcceptListener)}.
 	 */
 	public void start() throws IOException {
 		if (server != null) {
@@ -155,28 +156,40 @@ public class SimpleServer {
 	}
 
 
+	/**
+	 * Overwrites the socket address provided in the constructor.
+	 */
 	public SimpleServer setSocketAddress(SocketAddress socketAddress) {
 		this.socketAddress = socketAddress;
 		return this;
 	}
 
+	/**
+	 * Sets the core pool size, defaults to <code>2</code>.
+	 */
 	public SimpleServer setCorePoolSize(int corePoolSize) {
 		this.corePoolSize = corePoolSize;
 		return this;
 	}
 
+	/**
+	 * Sets the max pool size, defaults to {@link Integer#MAX_VALUE}.
+	 */
 	public SimpleServer setMaxPoolSize(int maxPoolSize) {
 		this.maxPoolSize = maxPoolSize;
 		return this;
 	}
 
+	/**
+	 * Sets the pool timeout in seconds, defaults to <code>60</code>.
+	 */
 	public SimpleServer setPoolTimeout(long poolTimeout) {
 		this.poolTimeout = poolTimeout;
 		return this;
 	}
 
 	/**
-	 * Sets the {@link ByteBuffer} capacity to use for client handlers.
+	 * Sets the {@link ByteBuffer} capacity to use for client handlers, defaults to <code>4096</code>.
 	 */
 	public SimpleServer setClientBufferCapacity(int clientBufferCapacity) {
 		this.clientBufferCapacity = clientBufferCapacity;
@@ -184,7 +197,8 @@ public class SimpleServer {
 	}
 
 	/**
-	 * Sets the executor to use when a new client is to be handled.
+	 * Sets the executor to use when a new client is to be handled.<br>
+	 * If unset or set to <code>null</code> then a new {@link ThreadPoolExecutor} is created on {@link #start()}.
 	 */
 	public SimpleServer setExecutor(Executor executor) {
 		this.executor = executor;

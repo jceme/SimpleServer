@@ -1,10 +1,11 @@
-package de.me.server.listener;
+package de.me.client;
 
+import de.me.server.listener.ClientBase;
 
 
 
 /**
- * A facade for a client accepted by the server.
+ * A facade for a simple client.
  */
 public interface Client extends ClientBase {
 
