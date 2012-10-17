@@ -11,6 +11,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.me.client.listener.Client;
+import de.me.client.listener.ClientListener;
 import de.me.server.ClientHandler;
 import de.me.server.ListenerException;
 import de.me.server.listener.ClientAcceptListener;
