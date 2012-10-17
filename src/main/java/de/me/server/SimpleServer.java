@@ -3,14 +3,19 @@ package de.me.server;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.nio.channels.AsynchronousCloseException;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +32,7 @@ public class SimpleServer {
 	private long poolTimeout = 60;
 	private Executor executor = null;
 
-	private List<Void> listeners = new LinkedList<>();
+	private final List<ClientAcceptListener> listeners = new LinkedList<>();
 
 	private ServerSocketChannel server;
 
@@ -54,6 +59,9 @@ public class SimpleServer {
 			throw new IllegalStateException("Server already started");
 		}
 
+		if (listeners.isEmpty()) {
+			log.warn("No listeners registered yet to handle client connections");
+		}
 		final Executor executor;
 		final boolean ownExecutor;
 		if (this.executor == null) {
@@ -72,6 +80,8 @@ public class SimpleServer {
 
 
 		try {
+			log.debug("Starting server");
+
 			server = ServerSocketChannel.open().bind(socketAddress);
 			log.info("Server listening on {}", socketAddress);
 
@@ -82,13 +92,23 @@ public class SimpleServer {
 						log.debug("Accepted new client from {}", client.getRemoteAddress());
 					}
 
-					//executor.execute(new ClientHandler(client));
+					for (ClientAcceptListener listener : listeners) {
+						executor.execute(new ClientAcceptHandler(client, listener));
+					}
 				}
 			}
 			finally {
-				log.debug("Closing server channel");
-				server.close();
+				if (server.isOpen()) {
+					log.debug("Closing server channel");
+					server.close();
+				}
 			}
+		}
+		catch (AsynchronousCloseException e) {
+		}
+		catch (Exception e) {
+			log.error("Server error", e);
+			throw e;
 		}
 		finally {
 			if (ownExecutor) {
@@ -96,12 +116,69 @@ public class SimpleServer {
 				((ThreadPoolExecutor) executor).shutdown();
 			}
 		}
+
+		log.info("Server shut down");
+	}
+
+
+	public void stop() throws IOException {
+		log.debug("Stopping server");
+		server.close();
+		log.debug("Server stopped");
+	}
+
+
+	public SimpleServer setSocketAddress(SocketAddress socketAddress) {
+		this.socketAddress = socketAddress;
+		return this;
+	}
+
+	public SimpleServer setCorePoolSize(int corePoolSize) {
+		this.corePoolSize = corePoolSize;
+		return this;
+	}
+
+	public SimpleServer setMaxPoolSize(int maxPoolSize) {
+		this.maxPoolSize = maxPoolSize;
+		return this;
+	}
+
+	public SimpleServer setPoolTimeout(long poolTimeout) {
+		this.poolTimeout = poolTimeout;
+		return this;
+	}
+
+	public SimpleServer setExecutor(Executor executor) {
+		this.executor = executor;
+		return this;
+	}
+
+	public SimpleServer addListener(ClientAcceptListener listener) {
+		if (listener == null) throw new IllegalArgumentException("Listener required");
+		listeners.add(listener);
+		return this;
 	}
 
 
 
 	public static void main(String[] args) throws Exception {
-		new SimpleServer().start();
+		final AtomicReference<SimpleServer> serverref = new AtomicReference<>();
+
+		// Stop server after 10 seconds
+		final ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
+		exec.schedule(new Callable<Void>() {
+			@Override
+			public Void call() throws Exception {
+				serverref.get().stop();
+				exec.shutdown();
+				return null;
+			}
+		}, 10, TimeUnit.SECONDS);
+
+		SimpleServer server = new SimpleServer();
+		serverref.set(server);
+
+		server.start();
 	}
 
 }
