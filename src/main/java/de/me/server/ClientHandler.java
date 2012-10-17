@@ -108,6 +108,7 @@ class ClientHandler implements Client {
 
 		for (ClientListener listener : listeners) {
 			try {
+				robuffer.rewind();
 				listener.onRead(robuffer);
 			}
 			catch (Throwable e) {

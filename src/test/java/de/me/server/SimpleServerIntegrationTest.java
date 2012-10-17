@@ -35,7 +35,7 @@ public class SimpleServerIntegrationTest {
 
 					@Override
 					public void onRead(ByteBuffer buffer) {
-						log.info("onRead: {}", buffer.limit());
+						log.info("onRead: {}", buffer);
 
 						try {
 							ByteBuffer buf = ByteBuffer.allocateDirect(buffer.limit() + 100);
@@ -45,9 +45,9 @@ public class SimpleServerIntegrationTest {
 
 							client.write(buf);
 
-							client.close();
+							//client.close();
 
-							server.stop();
+							//server.stop();
 						}
 						catch (IOException e) {
 							log.error("Write error", e);
@@ -62,6 +62,41 @@ public class SimpleServerIntegrationTest {
 					@Override
 					public void onClose() {
 						log.info("Client closed");
+					}
+
+				});
+
+				client.addListener(new ClientListener() {
+
+					@Override
+					public void onRead(ByteBuffer buffer) {
+						log.info("onRead2: {}", buffer);
+
+						try {
+							ByteBuffer buf = ByteBuffer.allocateDirect(buffer.limit() + 100);
+							buf.put(("[2] Hello you from "+client.getRemoteAddress()+"\n\nYou sent me:\n").getBytes());
+							buf.put(buffer);
+							buf.flip();
+
+							client.write(buf);
+
+							client.close();
+
+							server.stop();
+						}
+						catch (IOException e) {
+							log.error("Write error 2", e);
+						}
+					}
+
+					@Override
+					public void onError(Throwable e) {
+						log.error("onError 2", e);
+					}
+
+					@Override
+					public void onClose() {
+						log.info("Client closed 2");
 					}
 
 				});
