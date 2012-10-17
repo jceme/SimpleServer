@@ -30,12 +30,12 @@ public class SimpleServer {
 	private int corePoolSize = 2;
 	private int maxPoolSize = Integer.MAX_VALUE;
 	private long poolTimeout = 60;
+	private int clientBufferCapacity = 4096;
 	private Executor executor = null;
 
 	private final List<ClientAcceptListener> listeners = new LinkedList<>();
 
 	private ServerSocketChannel server;
-
 
 	public SimpleServer() {
 		this(8181);
@@ -93,7 +93,7 @@ public class SimpleServer {
 					}
 
 					for (ClientAcceptListener listener : listeners) {
-						executor.execute(new ClientAcceptHandler(client, listener));
+						executor.execute(new ClientAcceptHandler(client, listener, clientBufferCapacity));
 					}
 				}
 			}
@@ -145,6 +145,11 @@ public class SimpleServer {
 
 	public SimpleServer setPoolTimeout(long poolTimeout) {
 		this.poolTimeout = poolTimeout;
+		return this;
+	}
+
+	public SimpleServer setClientBufferCapacity(int clientBufferCapacity) {
+		this.clientBufferCapacity = clientBufferCapacity;
 		return this;
 	}
 
