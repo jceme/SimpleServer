@@ -5,6 +5,8 @@ import java.nio.channels.SocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.me.server.listener.ClientAcceptListener;
+
 
 class ClientAcceptHandler implements Runnable {
 
@@ -15,7 +17,7 @@ class ClientAcceptHandler implements Runnable {
 	private final ClientAcceptListener listener;
 
 
-	public ClientAcceptHandler(SocketChannel client, ClientAcceptListener listener, int capacity) {
+	ClientAcceptHandler(SocketChannel client, ClientAcceptListener listener, int capacity) {
 		this.client = client;
 		this.listener = listener;
 		this.capacity = capacity;

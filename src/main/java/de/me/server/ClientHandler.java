@@ -1,6 +1,7 @@
 package de.me.server;
 
 import java.io.IOException;
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
@@ -9,8 +10,15 @@ import java.nio.channels.SocketChannel;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import de.me.server.listener.ClientListener;
+
 
 class ClientHandler implements Client {
+
+	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	private final SocketChannel client;
 	private final List<ClientListener> listeners = new LinkedList<>();
@@ -56,7 +64,7 @@ class ClientHandler implements Client {
 
 
 	void execute() throws Exception {
-		//client.configureBlocking(false);
+		client.configureBlocking(false);
 
 		final Selector selector = Selector.open();
 		final SelectionKey selkey = client.register(selector, client.validOps());
@@ -84,10 +92,23 @@ class ClientHandler implements Client {
 	}
 
 
+	@Override
+	public SocketAddress getRemoteAddress() throws IOException {
+		return client.getRemoteAddress();
+	}
+
+	@Override
+	public boolean isOpen() {
+		return client.isOpen();
+	}
+
+
 	private void onRead(ByteBuffer buffer) throws ListenerException {
+		final ByteBuffer robuffer = buffer.asReadOnlyBuffer();
+
 		for (ClientListener listener : listeners) {
 			try {
-				listener.onRead(buffer);
+				listener.onRead(robuffer);
 			}
 			catch (Throwable e) {
 				throw new ListenerException(e);
@@ -114,6 +135,13 @@ class ClientHandler implements Client {
 			catch (Throwable ee) {
 				throw new ListenerException(ee);
 			}
+		}
+
+		try {
+			close();
+		}
+		catch (IOException ee) {
+			log.error("Failed to close client onError", ee);
 		}
 	}
 

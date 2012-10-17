@@ -1,4 +1,6 @@
-package de.me.server;
+package de.me.server.listener;
+
+import de.me.server.Client;
 
 
 public interface ClientAcceptListener {
