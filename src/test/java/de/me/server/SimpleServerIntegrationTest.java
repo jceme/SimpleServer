@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.me.server.listener.Client;
 import de.me.server.listener.ClientAcceptListener;
 import de.me.server.listener.ClientListener;
 
@@ -34,16 +35,16 @@ public class SimpleServerIntegrationTest {
 				client.addListener(new ClientListener() {
 
 					@Override
-					public void onRead(ByteBuffer buffer) {
-						log.info("onRead: {}", buffer);
+					public void onMessage(ByteBuffer messageBuffer) {
+						log.info("onRead: {}", messageBuffer);
 
 						try {
-							ByteBuffer buf = ByteBuffer.allocateDirect(buffer.limit() + 100);
+							ByteBuffer buf = ByteBuffer.allocateDirect(messageBuffer.limit() + 100);
 							buf.put(("Hello you from "+client.getRemoteAddress()+"\n\nYou sent me:\n").getBytes());
-							buf.put(buffer);
+							buf.put(messageBuffer);
 							buf.flip();
 
-							client.write(buf);
+							client.send(buf);
 
 							//client.close();
 
@@ -69,7 +70,7 @@ public class SimpleServerIntegrationTest {
 				client.addListener(new ClientListener() {
 
 					@Override
-					public void onRead(ByteBuffer buffer) {
+					public void onMessage(ByteBuffer buffer) {
 						log.info("onRead2: {}", buffer);
 
 						try {
@@ -78,7 +79,7 @@ public class SimpleServerIntegrationTest {
 							buf.put(buffer);
 							buf.flip();
 
-							client.write(buf);
+							client.send(buf);
 
 							client.close();
 

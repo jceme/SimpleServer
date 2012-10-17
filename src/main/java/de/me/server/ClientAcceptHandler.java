@@ -8,6 +8,9 @@ import org.slf4j.LoggerFactory;
 import de.me.server.listener.ClientAcceptListener;
 
 
+/**
+ * Internal class to handle an accepted client in an executor execution.
+ */
 class ClientAcceptHandler implements Runnable {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());

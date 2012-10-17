@@ -13,9 +13,13 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.me.server.listener.Client;
 import de.me.server.listener.ClientListener;
 
 
+/**
+ * Internal {@link Client} facade implementation.
+ */
 class ClientHandler implements Client {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
@@ -39,7 +43,7 @@ class ClientHandler implements Client {
 
 
 	@Override
-	public int write(ByteBuffer buffer) throws IOException {
+	public int send(ByteBuffer buffer) throws IOException {
 		return client.write(buffer);
 	}
 
@@ -63,6 +67,9 @@ class ClientHandler implements Client {
 	}
 
 
+	/**
+	 * Starts handling client traffic.
+	 */
 	void execute() throws Exception {
 		client.configureBlocking(false);
 
@@ -84,7 +91,7 @@ class ClientHandler implements Client {
 					}
 					else if (r > 0) {
 						buffer.flip();
-						onRead(buffer);
+						onMessage(buffer);
 					}
 				}
 			}
@@ -103,13 +110,13 @@ class ClientHandler implements Client {
 	}
 
 
-	private void onRead(ByteBuffer buffer) throws ListenerException {
+	private void onMessage(ByteBuffer buffer) throws ListenerException {
 		final ByteBuffer robuffer = buffer.asReadOnlyBuffer();
 
 		for (ClientListener listener : listeners) {
 			try {
 				robuffer.rewind();
-				listener.onRead(robuffer);
+				listener.onMessage(robuffer);
 			}
 			catch (Throwable e) {
 				throw new ListenerException(e);
@@ -138,6 +145,7 @@ class ClientHandler implements Client {
 			}
 		}
 
+		// Try to close the client connection
 		try {
 			close();
 		}
