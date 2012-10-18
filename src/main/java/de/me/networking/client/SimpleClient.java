@@ -104,6 +104,23 @@ public class SimpleClient implements Client {
 	}
 
 	@Override
+	public int getBufferCapacity() {
+		return clientBufferCapacity;
+	}
+
+	@Override
+	public void suspendMessages() {
+		checkHandler();
+		handler.suspendMessages();
+	}
+
+	@Override
+	public void resumeMessages() {
+		checkHandler();
+		handler.resumeMessages();
+	}
+
+	@Override
 	public int send(ByteBuffer buffer) throws IOException {
 		checkHandler();
 		return handler.send(buffer);

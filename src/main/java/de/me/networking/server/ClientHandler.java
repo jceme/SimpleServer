@@ -28,6 +28,8 @@ public class ClientHandler implements Client {
 	private final List<ClientListener> listeners = new LinkedList<>();
 	private final int capacity;
 
+	private boolean suspendRead = false;
+
 
 	public ClientHandler(SocketChannel client, int capacity) {
 		this.client = client;
@@ -39,6 +41,29 @@ public class ClientHandler implements Client {
 		if (listener == null) throw new IllegalArgumentException("Listener required");
 		listeners.add(listener);
 		return this;
+	}
+
+	@Override
+	public int getBufferCapacity() {
+		return capacity;
+	}
+
+	@Override
+	public void suspendMessages() {
+		suspendRead = true;
+	}
+
+	@Override
+	public void resumeMessages() {
+		try {
+			readClientInput(ByteBuffer.allocateDirect(capacity));
+		}
+		catch (IOException e) {
+			onError(e);
+		}
+		finally {
+			suspendRead = false;
+		}
 	}
 
 
@@ -88,21 +113,12 @@ public class ClientHandler implements Client {
 			if (selkey.isReadable()) {
 				log.trace("Client signalized readability");
 
-				buffer.clear();
-
-				int r = client.read(buffer);
-
-				if (r < 0) {
-					log.debug("Client read signalized EOF");
-
-					onClose();
-					break;
+				if (suspendRead) {
+					log.trace("Client read currently suspended");
 				}
-				else if (r > 0) {
-					log.trace("Client read message of length {}", r);
-
-					buffer.flip();
-					onMessage(buffer);
+				else if (readClientInput(buffer)) {
+					// Have EOF
+					break;
 				}
 			}
 
@@ -116,6 +132,27 @@ public class ClientHandler implements Client {
 				}
 			}
 		}
+	}
+
+	private boolean readClientInput(final ByteBuffer buffer) throws IOException {
+		buffer.clear();
+
+		int r = client.read(buffer);
+
+		if (r < 0) {
+			log.debug("Client read signalized EOF");
+
+			onClose();
+			return true;
+		}
+		else if (r > 0) {
+			log.trace("Client read message of length {}", r);
+
+			buffer.flip();
+			onMessage(buffer);
+		}
+
+		return false;
 	}
 
 
