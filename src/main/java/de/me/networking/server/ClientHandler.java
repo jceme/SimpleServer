@@ -55,14 +55,16 @@ public class ClientHandler implements Client {
 
 	@Override
 	public void resumeMessages() {
-		try {
-			readClientInput(ByteBuffer.allocateDirect(capacity));
-		}
-		catch (IOException e) {
-			onError(e);
-		}
-		finally {
-			suspendRead = false;
+		if (suspendRead) {
+			try {
+				readClientInput(ByteBuffer.allocateDirect(capacity));
+			}
+			catch (IOException e) {
+				onError(e);
+			}
+			finally {
+				suspendRead = false;
+			}
 		}
 	}
 
