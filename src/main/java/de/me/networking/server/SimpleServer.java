@@ -41,10 +41,10 @@ public class SimpleServer {
 
 
 	/**
-	 * Create new {@link SimpleServer} listening on port 8181 on all interfaces.
+	 * Create new {@link SimpleServer} listening on port 8080 on all interfaces.
 	 */
 	public SimpleServer() {
-		this(8181);
+		this(8080);
 	}
 
 	/**
