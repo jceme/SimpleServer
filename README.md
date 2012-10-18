@@ -17,6 +17,8 @@ server.addListener(new ClientAcceptListener() {
 
 			@Override
 			public void onMessage(ByteBuffer messageBuffer) {
+				// Note that messageBuffer is a read-only ByteBuffer!
+				
 				try {
 					ByteBuffer buf = ByteBuffer.allocateDirect(messageBuffer.limit() + 100);
 					buf.put(("Hello you from " + client.getRemoteAddress() + "\n\nYou sent me:\n").getBytes());
@@ -74,6 +76,8 @@ client.addListener(new ClientListener() {
 	@Override
 	public void onMessage(ByteBuffer messageBuffer) {
 		// Received new message from server
+
+		// Note that messageBuffer is a read-only ByteBuffer!
 	}
 
 	@Override
