@@ -1,4 +1,4 @@
-package de.me.server;
+package de.me.networking;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -7,8 +7,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.me.client.SimpleClient;
-import de.me.client.listener.ClientListener;
+import de.me.networking.client.SimpleClient;
+import de.me.networking.client.listener.ClientListener;
 
 
 public class SimpleClientIntegrationTest {

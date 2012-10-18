@@ -1,4 +1,4 @@
-package de.me.server;
+package de.me.networking.server;
 
 import java.io.IOException;
 import java.net.SocketAddress;
@@ -13,8 +13,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.me.server.listener.Client;
-import de.me.server.listener.ClientListener;
+import de.me.networking.server.listener.Client;
+import de.me.networking.server.listener.ClientListener;
 
 
 /**

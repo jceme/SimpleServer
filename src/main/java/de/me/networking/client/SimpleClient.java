@@ -1,4 +1,4 @@
-package de.me.client;
+package de.me.networking.client;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -11,11 +11,11 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.me.client.listener.Client;
-import de.me.client.listener.ClientListener;
-import de.me.server.ClientHandler;
-import de.me.server.ListenerException;
-import de.me.server.listener.ClientAcceptListener;
+import de.me.networking.client.listener.Client;
+import de.me.networking.client.listener.ClientListener;
+import de.me.networking.server.ClientHandler;
+import de.me.networking.server.ListenerException;
+import de.me.networking.server.listener.ClientAcceptListener;
 
 
 /**

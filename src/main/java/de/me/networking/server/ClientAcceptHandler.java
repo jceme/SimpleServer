@@ -1,11 +1,11 @@
-package de.me.server;
+package de.me.networking.server;
 
 import java.nio.channels.SocketChannel;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.me.server.listener.ClientAcceptListener;
+import de.me.networking.server.listener.ClientAcceptListener;
 
 
 /**

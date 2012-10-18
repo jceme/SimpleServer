@@ -1,4 +1,4 @@
-package de.me.server.listener;
+package de.me.networking.server.listener;
 
 import java.nio.ByteBuffer;
 

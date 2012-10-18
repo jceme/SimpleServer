@@ -1,4 +1,4 @@
-package de.me.server;
+package de.me.networking.server;
 
 /**
  * This exception is thrown if the execution of a listener callback threw an exception.<br/>

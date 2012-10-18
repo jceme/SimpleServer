@@ -1,4 +1,4 @@
-package de.me.server;
+package de.me.networking.server;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.me.server.listener.ClientAcceptListener;
+import de.me.networking.server.listener.ClientAcceptListener;
 
 
 /**
