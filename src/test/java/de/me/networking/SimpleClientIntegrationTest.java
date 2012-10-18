@@ -41,8 +41,6 @@ public class SimpleClientIntegrationTest {
 			@Override
 			public void onMessage(ByteBuffer messageBuffer) {
 				log.info("onMessage: {}", messageBuffer);
-
-				//TODO
 			}
 
 			@Override
