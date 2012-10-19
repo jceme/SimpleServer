@@ -1,5 +1,6 @@
 package de.me.networking.server;
 
+import java.io.IOException;
 import java.nio.channels.SocketChannel;
 
 import org.slf4j.Logger;
@@ -46,6 +47,14 @@ class ClientAcceptHandler implements Runnable {
 			}
 			catch (Throwable ee) {
 				log.error("Error in client handler onError", ee);
+			}
+			finally {
+				try {
+					client.close();
+				}
+				catch (IOException eee) {
+					log.error("Cannot close client connection", eee);
+				}
 			}
 		}
 	}
