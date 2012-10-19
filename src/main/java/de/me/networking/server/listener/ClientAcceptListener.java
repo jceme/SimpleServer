@@ -1,5 +1,7 @@
 package de.me.networking.server.listener;
 
+import java.io.IOException;
+
 
 
 /**
@@ -14,6 +16,6 @@ public interface ClientAcceptListener {
 	 *
 	 * @param client the accepted client (facade)
 	 */
-	public void onIncomingClient(Client client);
+	public void onIncomingClient(Client client) throws IOException;
 
 }

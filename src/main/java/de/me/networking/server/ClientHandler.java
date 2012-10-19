@@ -97,7 +97,7 @@ public class ClientHandler implements Client {
 	/**
 	 * Starts handling client traffic.
 	 */
-	public void execute() throws Exception {
+	public void execute() throws IOException {
 		client.configureBlocking(false);
 
 		final Selector selector = Selector.open();

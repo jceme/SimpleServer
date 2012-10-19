@@ -1,5 +1,6 @@
 package de.me.networking.server.listener;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 
@@ -13,13 +14,13 @@ public interface ClientListener {
 	 *
 	 * @param buffer the <b>read-only</b> buffer containing the data
 	 */
-	public void onMessage(ByteBuffer messageBuffer);
+	public void onMessage(ByteBuffer messageBuffer) throws IOException;
 
 	/**
 	 * Notification that the client closed the connection.<br>
 	 * <b>Note</b> that this does not notify server-side closes as with {@link Client#close()}!
 	 */
-	public void onClose();
+	public void onClose() throws IOException;
 
 	/**
 	 * Notification that some exception happened when dealing with the client.<br><br>
