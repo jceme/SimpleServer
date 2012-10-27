@@ -10,6 +10,7 @@ import java.nio.channels.SocketChannel;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executor;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -113,8 +114,19 @@ public class SimpleServer {
 						log.debug("Accepted new client from {}", client.getRemoteAddress());
 					}
 
-					for (ClientAcceptListener listener : listeners) {
-						executor.execute(new ClientAcceptHandler(client, listener, clientBufferCapacity));
+					try {
+						for (ClientAcceptListener listener : listeners) {
+							executor.execute(new ClientAcceptHandler(client, listener, clientBufferCapacity));
+						}
+					}
+					catch (RejectedExecutionException e) {
+						log.error("Rejected execution for client handling", e);
+						try {
+							client.close();
+						}
+						catch (IOException ee) {
+							log.error("Cannot close client after rejection", ee);
+						}
 					}
 				}
 			}
