@@ -139,7 +139,15 @@ public class ClientHandler implements Client {
 	private boolean readClientInput(final ByteBuffer buffer) throws IOException {
 		buffer.clear();
 
-		int r = client.read(buffer);
+		int r;
+
+		try {
+			r = client.read(buffer);
+		}
+		catch (ClosedChannelException e) {
+			log.debug("Client already closed");
+			return true;
+		}
 
 		if (r < 0) {
 			log.debug("Client read signalized EOF");
