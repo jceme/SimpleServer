@@ -101,38 +101,43 @@ public class ClientHandler implements Client {
 		client.configureBlocking(false);
 
 		final Selector selector = Selector.open();
-		final SelectionKey selkey = client.register(selector, client.validOps());
+		try {
+			final SelectionKey selkey = client.register(selector, client.validOps());
 
-		final ByteBuffer buffer = ByteBuffer.allocateDirect(capacity);
+			final ByteBuffer buffer = ByteBuffer.allocateDirect(capacity);
 
-		for (;;) {
-			selector.select();
+			for (;;) {
+				selector.select();
 
-			if (log.isTraceEnabled()) {
-				log.trace("Have selection ops {}", selkey.readyOps());
+				if (log.isTraceEnabled()) {
+					log.trace("Have selection ops {}", selkey.readyOps());
+				}
+
+				if (selkey.isReadable()) {
+					log.trace("Client signalized readability");
+
+					if (suspendRead) {
+						log.trace("Client read currently suspended");
+					}
+					else if (readClientInput(buffer)) {
+						// Have EOF
+						break;
+					}
+				}
+
+				if (log.isTraceEnabled()) {
+					if (selkey.isConnectable()) {
+						log.trace("Client signalized connectability");
+					}
+
+					if (selkey.isWritable()) {
+						log.trace("Client signalized writability");
+					}
+				}
 			}
-
-			if (selkey.isReadable()) {
-				log.trace("Client signalized readability");
-
-				if (suspendRead) {
-					log.trace("Client read currently suspended");
-				}
-				else if (readClientInput(buffer)) {
-					// Have EOF
-					break;
-				}
-			}
-
-			if (log.isTraceEnabled()) {
-				if (selkey.isConnectable()) {
-					log.trace("Client signalized connectability");
-				}
-
-				if (selkey.isWritable()) {
-					log.trace("Client signalized writability");
-				}
-			}
+		}
+		finally {
+			selector.close();
 		}
 	}
 

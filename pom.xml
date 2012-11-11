@@ -79,27 +79,36 @@
 					<jvm>${java7.java}</jvm>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-failsafe-plugin</artifactId>
-				<version>${surefire.version}</version>
-				<executions>
-					<execution>
-						<phase>integration-test</phase>
-						<goals>
-							<goal>integration-test</goal>
-							<!-- <goal>verify</goal> -->
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<redirectTestOutputToFile>true</redirectTestOutputToFile>
-					<includes>
-						<include>**/*IntegrationTest.*</include>
-					</includes>
-					<jvm>${java7.java}</jvm>
-				</configuration>
-			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+		<profile>
+			<id>integration</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<version>${surefire.version}</version>
+						<executions>
+							<execution>
+								<phase>integration-test</phase>
+								<goals>
+									<goal>integration-test</goal>
+									<!-- <goal>verify</goal> -->
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<redirectTestOutputToFile>true</redirectTestOutputToFile>
+							<includes>
+								<include>**/*IntegrationTest.*</include>
+							</includes>
+							<jvm>${java7.java}</jvm>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
